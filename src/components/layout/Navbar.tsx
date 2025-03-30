@@ -1,103 +1,293 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import ThemeToggle from "../common/ThemeToggle";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Button,
+  Typography,
+  Avatar,
+  Chip,
+} from "@mui/material";
+import {
+  Menu as MenuIcon,
+  DirectionsCar,
+  AddCircleOutline,
+} from "@mui/icons-material";
 import LogoutButton from "../auth/LogoutButton";
+import { Login, PersonAdd, AccountCircle } from "@mui/icons-material";
 
-interface SidebarProps {
-  onToggleSidebar: () => void;
-}
+const Navbar: React.FC = () => {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
-const Navbar: React.FC<SidebarProps> = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  // Check authentication state
+  const { isAuthenticated, user } = useSelector(
+    (state: RootState) => state.auth
+  );
+
+  const handleDrawerToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
+  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
 
   return (
     <>
-      {/* Navbar */}
-      <nav className="bg-blue-600 dark:bg-gray-800 p-4 shadow-md">
-        <div className="container mx-auto flex justify-between items-center">
-          {/* Brand */}
-          <Link to="/" className="text-white text-2xl font-bold">
-            ELD App
-          </Link>
+      <AppBar
+        position="fixed"
+        sx={{
+          zIndex: 1300, // Static value instead of theme.zIndex.drawer + 1
+          background:
+            "linear-gradient(135deg, #1976d2 0%, #2196f3 50%, #64b5f6 100%)", // Static gradient (removed dark mode logic)
+          boxShadow: "none",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.12)", // Static border color
+        }}
+      >
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          {/* Brand Logo - Always visible */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, display: { md: "none" } }}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Link to="/" style={{ textDecoration: "none" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  color: "white",
+                  "&:hover": {
+                    opacity: 0.9,
+                  },
+                }}
+              >
+                <DirectionsCar sx={{ mr: 1, fontSize: "2rem" }} />
+                <Typography
+                  variant="h6"
+                  noWrap
+                  component="div"
+                  sx={{
+                    fontWeight: 700,
+                    letterSpacing: "0.05rem",
+                  }}
+                >
+                  ELD Tracker
+                </Typography>
+              </Box>
+            </Link>
+          </Box>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/trips" className="text-white hover:text-gray-200">
-              Trips
-            </Link>
-            <Link to="/create-trip" className="text-white hover:text-gray-200">
-              Create Trip
-            </Link>
-            <ThemeToggle />
-            <LogoutButton />
-          </div>
+          {/* Desktop Navigation */}
+          {isAuthenticated ? (
+            // Authenticated User View
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Link to="/trips" style={{ textDecoration: "none" }}>
+                <Button
+                  color="inherit"
+                  startIcon={<DirectionsCar />}
+                  sx={{
+                    color: "white",
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+                  }}
+                >
+                  Trips
+                </Button>
+              </Link>
+              <Link to="/create-trip" style={{ textDecoration: "none" }}>
+                <Button
+                  color="inherit"
+                  startIcon={<AddCircleOutline />}
+                  sx={{
+                    color: "white",
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+                  }}
+                >
+                  New Trip
+                </Button>
+              </Link>
+
+              {/* User Profile */}
+              <Link to="/profile" style={{ textDecoration: "none" }}>
+                <Chip
+                  avatar={
+                    <Avatar src={user?.avatar}>
+                      <AccountCircle />
+                    </Avatar>
+                  }
+                  variant="outlined"
+                  sx={{
+                    ml: 2,
+                    color: "white",
+                    borderColor: "rgba(255,255,255,0.3)",
+                    "& .MuiChip-avatar": { color: "#1976d2" }, // Static color
+                  }}
+                />
+              </Link>
+
+              <LogoutButton />
+            </Box>
+          ) : (
+            // Unauthenticated User View
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
+              <Link to="/login" style={{ textDecoration: "none" }}>
+                <Button
+                  color="inherit"
+                  startIcon={<Login />}
+                  sx={{
+                    color: "white",
+                    "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+                  }}
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register" style={{ textDecoration: "none" }}>
+                <Button
+                  variant="outlined"
+                  startIcon={<PersonAdd />}
+                  sx={{
+                    color: "white",
+                    borderColor: "white",
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      borderColor: "white",
+                    },
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </Link>
+            </Box>
+          )}
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <MenuIcon fontSize="large" />
-          </button>
-        </div>
-      </nav>
+          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+            <IconButton
+              size="large"
+              color="inherit"
+              aria-label="menu"
+              onClick={handleMenuOpen}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-      {/* Overlay (Click to Close Sidebar) */}
-      <div
-        className={`fixed inset-0 backdrop-blur-md z-40 transition-opacity ${
-          isSidebarOpen ? "opacity-100 visible" : "opacity-0 invisible"
-        } md:hidden`}
-        onClick={() => setIsSidebarOpen(false)}
+      {/* Mobile Menu */}
+      <Menu
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={handleMenuClose}
+        PaperProps={{
+          sx: {
+            width: 250,
+            bgcolor: "#ffffff", // Static background color
+            border: "1px solid rgba(0, 0, 0, 0.12)", // Static border color
+          },
+        }}
       >
-        {/* Sidebar (Not Full-Screen) */}
-        <div
-          className={`fixed right-0 top-0 h-full w-3/4 max-w-xs bg-gray-100 dark:bg-gray-900 p-5 shadow-lg rounded-l-lg transform ${
-            isSidebarOpen ? "translate-x-0" : "translate-x-full"
-          } transition-transform`}
-          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-        >
-          {/* Close Button (Styled & Positioned Better) */}
-          <button
-            className="absolute top-3 right-3 p-2 bg-gray-700 dark:bg-gray-600 text-white rounded-full hover:bg-gray-500"
-            onClick={() => setIsSidebarOpen(false)}
-          >
-            <CloseIcon fontSize="medium" />
-          </button>
-
-          {/* Sidebar Content */}
-          <h2 className="text-lg font-semibold mb-4 text-gray-800 dark:text-gray-200">
-            Menu
-          </h2>
-          <ul>
-            <li className="mb-3">
-              <Link
+        {isAuthenticated
+          ? [
+              <MenuItem
+                key="profile"
+                component={Link}
+                to="/profile"
+                onClick={handleMenuClose}
+              >
+                <ListItemIcon>
+                  <AccountCircle color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="My Profile" />
+              </MenuItem>,
+              <Divider key="divider1" />,
+              <MenuItem
+                key="trips"
+                component={Link}
                 to="/trips"
-                className="block p-2 text-blue-600 dark:text-blue-400 hover:underline"
-                onClick={() => setIsSidebarOpen(false)}
+                onClick={handleMenuClose}
               >
-                My Trips
-              </Link>
-            </li>
-            <li className="mb-3">
-              <Link
+                <ListItemIcon>
+                  <DirectionsCar color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="My Trips" />
+              </MenuItem>,
+              <MenuItem
+                key="create-trip"
+                component={Link}
                 to="/create-trip"
-                className="block p-2 text-blue-600 dark:text-blue-400 hover:underline"
-                onClick={() => setIsSidebarOpen(false)}
+                onClick={handleMenuClose}
               >
-                Create Trip
-              </Link>
-            </li>
-            <li className="mb-3">
-              <ThemeToggle />
-            </li>
-            <li className="mb-3">
-              <LogoutButton />
-            </li>
-          </ul>
-        </div>
-      </div>
+                <ListItemIcon>
+                  <AddCircleOutline color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="New Trip" />
+              </MenuItem>,
+              <Divider key="divider2" />,
+              <MenuItem key="logout" onClick={handleMenuClose}>
+                <LogoutButton fullWidth />
+              </MenuItem>,
+            ]
+          : [
+              <MenuItem
+                key="login"
+                component={Link}
+                to="/login"
+                onClick={handleMenuClose}
+              >
+                <ListItemIcon>
+                  <Login color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Sign In" />
+              </MenuItem>,
+              <MenuItem
+                key="register"
+                component={Link}
+                to="/register"
+                onClick={handleMenuClose}
+              >
+                <ListItemIcon>
+                  <PersonAdd color="primary" />
+                </ListItemIcon>
+                <ListItemText primary="Sign Up" />
+              </MenuItem>,
+            ]}
+      </Menu>
+
+      {/* Spacer for content below fixed AppBar */}
+      <Toolbar />
     </>
   );
 };

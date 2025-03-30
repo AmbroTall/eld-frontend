@@ -4,9 +4,11 @@ import { logout } from "../../store/slices/authSlice";
 import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import Button from "../common/Button";
+import { useNavigate } from "react-router-dom";
 
 const LogoutButton: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const isAuthenticated = useSelector(
     (state: RootState) => state.auth.isAuthenticated
   );
@@ -15,6 +17,7 @@ const LogoutButton: React.FC = () => {
     dispatch(logout());
     localStorage.removeItem("token");
     toast.success("Logged out successfully!");
+    navigate("/login");
   };
 
   if (!isAuthenticated) return null;

@@ -6,7 +6,12 @@
   ],
 
   "compilerOptions": {
+    "skipLibCheck": true,
+    "noImplicitAny": false,
     "strict": false,
-    "noImplicitAny": false
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowUnreachableCode": true,
+    "allowUnusedLabels": true
   }
 }
